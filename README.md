@@ -1,6 +1,9 @@
 # cbr2PDF-Converter
 A simple piece of software to convert CBR files into PDF
 
+#Download Software
+[![Download cbr To PDF converter](https://img.shields.io/sourceforge/dt/cbrtopdf.svg)](https://sourceforge.net/projects/cbrtopdf/files/latest/download)
+
 #Project Description
 Do you have a problem with a Ebook reader that can't read CBR/CBZ files?
 But it can read PDF files?
