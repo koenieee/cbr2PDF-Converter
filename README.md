@@ -34,8 +34,9 @@ Usage:
 
 
 #TODO
-Upload source code to github
-Fix Bugs
+1. Upload source code to github
+
+2. Fix Bugs
 
 #Project Link
 The offical page of this project is can be found here:
