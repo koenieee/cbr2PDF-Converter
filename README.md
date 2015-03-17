@@ -6,10 +6,11 @@ Do you have a problem with a Ebook reader that can't read CBR/CBZ files?
 But it can read PDF files?
 
 This program is your solution! With two clicks you create your own PDF file from a CBR or a CBZ file.
-Do you have problems with this software or you just want to see a new feature? 
 
+Do you have problems with this software or you just want to see a new feature? 
 Please open a new issue: https://github.com/koen-github/cbr2PDF-Converter/issues So I can look into it.
 
+* * *
 
 Known Bugs:
 - for now the program is in Dutch, but it's not that hard to use.
