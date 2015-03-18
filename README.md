@@ -37,6 +37,6 @@ Or just click in Windows Explorer on a CBZ/CBR file to convert it into PDF.
 2. Implement new features.
 
 #Project Link
-The offical page of this project is can be found here:
+The offical page of this project can be found here:
 https://sourceforge.net/p/cbrtopdf/
 
