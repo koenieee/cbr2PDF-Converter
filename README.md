@@ -10,7 +10,7 @@ But it can read PDF files?
 
 This program is your solution! With two clicks you create your own PDF file from a CBR or a CBZ file.
 
-Do you have problems with this software or you just want to see a new feature? 
+Any issues with this software? Or you just want to see a new feature? 
 Please open a new issue: https://github.com/koen-github/cbr2PDF-Converter/issues So I can look into it.
 
 * * *
