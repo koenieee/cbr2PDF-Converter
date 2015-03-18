@@ -52,9 +52,9 @@
             this.label1.Location = new System.Drawing.Point(7, 49);
             this.label1.Margin = new System.Windows.Forms.Padding(0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(119, 13);
+            this.label1.Size = new System.Drawing.Size(90, 13);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Bezig met conveteren...";
+            this.label1.Text = "Ready to Convert";
             // 
             // button2
             // 
@@ -69,8 +69,13 @@
             // 
             this.notifyIcon1.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
-            this.notifyIcon1.Text = "Klik om map te openen";
+            this.notifyIcon1.Text = "CBR to PDF Converter";
             this.notifyIcon1.Visible = true;
+            // 
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.WorkerReportsProgress = true;
+            this.backgroundWorker1.WorkerSupportsCancellation = true;
             // 
             // Form1
             // 
@@ -91,10 +96,10 @@
 
         #endregion
 
-        private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        public System.Windows.Forms.ProgressBar progressBar1;
+        public System.Windows.Forms.NotifyIcon notifyIcon1;
     }
 }

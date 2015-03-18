@@ -31,13 +31,14 @@ namespace CbrToPdf
         public Form1(string[] args)
         {
             InitializeComponent();
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnApplicationExit);
 
             if (args.Length == 0)
             {
                 OpenFileDialog dialog = new OpenFileDialog();
                 dialog.Filter = "CBR files (*.cbr)|*.cbr";
 
-                dialog.InitialDirectory = "C:"; 
+                dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile); ; 
                 dialog.Title = "Select a CBR  File";
                 DialogResult result = dialog.ShowDialog();
 
@@ -49,26 +50,7 @@ namespace CbrToPdf
                 else if (result.Equals(DialogResult.OK))
                 {
                     input_bestand = dialog.FileName;
-                    string dir = Path.GetDirectoryName(input_bestand);
-                    string testFile = dir + "\\" + Path.GetFileNameWithoutExtension(input_bestand) + ".lock"; ;
-                    try
-                    {
-                        System.IO.StreamWriter file = new System.IO.StreamWriter(testFile);
-                        file.Close();
-
-                        File.Delete(testFile);
-                    }
-                    catch (System.UnauthorizedAccessException)
-                    {
-                        MessageBox.Show("No write access to this directory: " + dir, "CBR To PDF Conveter", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                        System.Environment.Exit(1);
-                    }
-
                 }
-               
-                
-
             }
             else
             {
@@ -81,6 +63,24 @@ namespace CbrToPdf
             }
             else
             {
+
+
+                string dir = Path.GetDirectoryName(input_bestand);
+                string testFile = dir + "\\" + Path.GetFileNameWithoutExtension(input_bestand) + ".lock"; ;
+                try
+                {
+                    System.IO.StreamWriter file = new System.IO.StreamWriter(testFile);
+                    file.Close();
+
+                    File.Delete(testFile);
+                }
+                catch (System.UnauthorizedAccessException)
+                {
+                    MessageBox.Show("No write access to this directory: " + dir, "CBR To PDF Conveter", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    System.Environment.Exit(1);
+                }
+
                 //backgroundWorker1.RunWorkerAsync();
                 // //backgroundWorker1.WorkerReportsProgress = true;
                 //backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker1_DoWork);
@@ -96,6 +96,15 @@ namespace CbrToPdf
                 label1.Text = "Processing '" + Path.GetFileName(input_bestand) + "'...";
             }
         }
+
+        private void OnApplicationExit(object sender, EventArgs e)
+        {
+            notifyIcon1.Visible = false;
+            notifyIcon1.Icon = null;
+            notifyIcon1.Dispose();
+            Application.DoEvents();
+        }
+
 
         private void button2_Click_1(object sender, EventArgs e)
         {
@@ -119,7 +128,7 @@ namespace CbrToPdf
                     int i = 0;
                     backgroundWorker1.ReportProgress(i);
 
-                    //============Variablen=========================//
+                    //============Variables=========================//
                     string inputfile = input_bestand;
                     
 
@@ -214,33 +223,6 @@ namespace CbrToPdf
             }
         }
 
-        public static bool HasWritePermissionOnDir(string path)
-        {
-            var writeAllow = false;
-            var writeDeny = false;
-            var accessControlList = Directory.GetAccessControl(path);
-            if (accessControlList == null)
-                return false;
-            var accessRules = accessControlList.GetAccessRules(true, true,
-                                        typeof(System.Security.Principal.SecurityIdentifier));
-            if (accessRules == null)
-                return false;
-
-            foreach (FileSystemAccessRule rule in accessRules)
-            {
-                if ((FileSystemRights.Write & rule.FileSystemRights) != FileSystemRights.Write)
-                    continue;
-
-                if (rule.AccessControlType == AccessControlType.Allow)
-                    writeAllow = true;
-                else if (rule.AccessControlType == AccessControlType.Deny)
-                    writeDeny = true;
-            }
-
-            return writeAllow && !writeDeny;
-        }
-
-
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             progressBar1.Value = e.ProgressPercentage;
@@ -250,6 +232,7 @@ namespace CbrToPdf
                 label1.Text = "Conversion Completed!";
             }
         }
+
         public void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             progressBar1.Value = 100;
@@ -258,8 +241,7 @@ namespace CbrToPdf
             notifyIcon1.Visible = true;
 
             notifyIcon1.ShowBalloonTip(5000, "Completion", "File '" + file + "' has been converted to PDF.", ToolTipIcon.Info);
-
-
+            
             System.Environment.Exit(1);
         }
     }
