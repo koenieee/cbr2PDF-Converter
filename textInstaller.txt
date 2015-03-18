@@ -1,0 +1,15 @@
+Do you have a problem with a Ebook reader that can't read CBR/CBZ files?
+But it can read PDF files?
+
+Here is your solution!
+Very easy to use
+Known Bugs:
+- It could be possible that right clicking on a CBR file doesn't work at the moment in windows 8
+
+Usage:
+
+1. Start CBR 2 PDF converter via the start menu
+2. Select your CBR File
+3. Wait..
+4. When the task is done, you get a popup right in your taskbar
+5. Output name is in the same location as the CBR file and has the same file name except for *.cbr
