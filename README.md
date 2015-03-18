@@ -23,7 +23,7 @@ Usage:
 4. When the task is done, you get a popup right in your taskbar
 5. Output name is in the same location as the CBR file and has the same file name except for *.cbr
 
-Or just click in Windows Explorer on a CBZ/CBR file to convert it into PDF.
+Or just right click in Windows Explorer on a CBZ/CBR file to convert it into PDF.
 
 #Other Bugs
 + Better and faster creation of PDF's from CBR's
