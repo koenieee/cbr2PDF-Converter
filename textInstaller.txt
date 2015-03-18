@@ -3,8 +3,8 @@ But it can read PDF files?
 
 Here is your solution!
 Very easy to use
-Known Bugs:
-- It could be possible that right clicking on a CBR file doesn't work at the moment in windows 8
+
+Support for both CBR and CBZ files.
 
 Usage:
 
@@ -13,3 +13,5 @@ Usage:
 3. Wait..
 4. When the task is done, you get a popup right in your taskbar
 5. Output name is in the same location as the CBR file and has the same file name except for *.cbr
+
+Or just right click in Windows Explorer on a cbr/cbz file.

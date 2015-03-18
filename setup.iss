@@ -23,8 +23,8 @@ DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 InfoBeforeFile=C:\Users\koen\Dropbox\cbr naar pdf converter\textbefore.txt
 InfoAfterFile=C:\Users\koen\Dropbox\cbr naar pdf converter\textInstaller.txt
-OutputDir=C:\Users\koen\Dropbox\cbr naar pdf converter
-OutputBaseFilename=setup
+OutputDir=C:\Users\koen
+OutputBaseFilename=CBR2PDF_setup_8.11
 Compression=lzma
 SolidCompression=yes
 
@@ -48,7 +48,11 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: quicklaunchicon
 
 [Registry]
-Root: HKCR; Subkey: "*\shell\CBR to PDF\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Cbr2PDF.exe"" ""%1"""; Flags: uninsdeletekey
+Root: HKCR; Subkey: "SystemFileAssociations\.cbr\shell\CBR to PDF"; Flags: uninsdeletekey deletekey
+Root: HKCR; Subkey: "SystemFileAssociations\.cbr\shell\CBR to PDF\command"; ValueType: string; ValueData: """{app}\Cbr2PDF.exe"" ""%1"""; Flags: uninsdeletekey deletekey
+Root: HKCR; Subkey: "SystemFileAssociations\.cbz\shell\CBR to PDF"; Flags: uninsdeletekey deletekey
+Root: HKCR; Subkey: "SystemFileAssociations\.cbz\shell\CBR to PDF\command"; ValueType: string; ValueData: """{app}\Cbr2PDF.exe"" ""%1"""; Flags: uninsdeletekey deletekey
+
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

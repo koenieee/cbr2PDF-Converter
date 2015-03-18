@@ -1,4 +1,4 @@
 Thank you for downloading CBR to PDF converter
-This program can convert any CBR file into a PDF file.
+This program can convert any CBR or CBZ file into a PDF file.
 Very handy if you want to read a CBR file on a non-supported platform such as an e-reader or a mobile phone.
 Please see https://sourceforge.net/projects/cbrtopdf/ for new software updates or if you want to report a bug.
