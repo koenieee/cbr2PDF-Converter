@@ -27,6 +27,7 @@ namespace CbrToPdf
     {
         public string input_bestand;
         private bool finished = false;
+        
 
         public Form1(string[] args)
         {
@@ -36,10 +37,10 @@ namespace CbrToPdf
             if (args.Length == 0)
             {
                 OpenFileDialog dialog = new OpenFileDialog();
-                dialog.Filter = "CBR files (*.cbr)|*.cbr";
+                dialog.Filter = "CBR files (*.cbr)|*.cbr|CBZ files (*.cbz)|*.cbz";
 
                 dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile); ; 
-                dialog.Title = "Select a CBR  File";
+                dialog.Title = "Select a CBR/CBZ  File";
                 DialogResult result = dialog.ShowDialog();
 
                 if (result.Equals(DialogResult.Cancel) || result.Equals(DialogResult.Abort))
@@ -160,21 +161,32 @@ namespace CbrToPdf
 
                     //CBR Unzipping=========================================//
                     Chilkat.Rar rar = new Chilkat.Rar();
+                    Chilkat.Zip zip = new Chilkat.Zip();
+                    zip.UnlockComponent("ZIPT34MB34N_2E76BEB1p39E");
+                    bool rarsuccess;
+                    bool zipsucces;
 
-                    bool success;
-
-                    success = rar.Open(inputfile);
-                    if (success != true)
+                    rarsuccess = rar.Open(inputfile);
+                    if (rarsuccess != true)
                     {
-                        MessageBox.Show(rar.LastErrorText);
-                        return;
+                        zipsucces = zip.OpenZip(inputfile);
+                        if (zipsucces != true)
+                        {
+                            MessageBox.Show(zip.LastErrorText);
+                            System.Environment.Exit(1);
+                        }
                     }
 
-                    success = rar.Unrar(inputfolder);
-                    if (success != true)
+                    rarsuccess = rar.Unrar(inputfolder);
+                    if (rarsuccess != true)
                     {
-                        MessageBox.Show(rar.LastErrorText);
-                        return;
+                        int zipreturn = zip.Unzip(inputfolder);
+                        if (zipreturn == -1)
+                        {
+                            MessageBox.Show(zip.LastErrorText);
+                            System.Environment.Exit(1);
+                        }
+                        
                     }
                     else
                     {
