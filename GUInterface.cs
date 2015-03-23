@@ -32,12 +32,16 @@ namespace CbrToPdf
         public string input_bestand;
         private bool finished = false;
         private bool multipleFolder = false;
+        List<String> filteredFiles;
 
         public GUIInterface(string[] args)
         {
             InitializeComponent();
+            
+           
+            
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnApplicationExit);
-
+            
             if (args.Length == 0)
             {
                 DialogResult mf = MessageBox.Show("Press Yes, if you want to convert a whole folder.\n\nPress No, If you only want to convert a single file.", "CBR To PDF Conveter", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk);
@@ -96,6 +100,11 @@ namespace CbrToPdf
                     string testFile = input_bestand + "\\123456789folder.lock";
                     testWriteAccess(testFile);
                     label1.Text = "Processing folder '" + input_bestand + "'...";
+                    filteredFiles = Directory.GetFiles(input_bestand, "*.*").Where(file => file.ToLower().EndsWith("cbr") || file.ToLower().EndsWith("cbz")).ToList();
+                    foreach (string filename in filteredFiles)
+                    {
+                        dataGridView1.Rows.Add(Path.GetFileName(filename), 10);
+                    }
                 }
                 else
                 {
@@ -164,11 +173,11 @@ namespace CbrToPdf
                 {
                     if (multipleFolder)
                     {
-                        List<String> filteredFiles = Directory.GetFiles(input_bestand, "*.*").Where(file => file.ToLower().EndsWith("cbr") || file.ToLower().EndsWith("cbz")).ToList();
+                        
                         ArrayList allthread = new ArrayList();//Thread th[];
                         foreach (string fileName in filteredFiles)
                         {
-
+                            
                             ProcessFile pF = new ProcessFile(fileName);
                             pF.setProgressListener(this);
                             Thread th = new Thread(new ThreadStart(pF.startConvertingFile));
@@ -206,12 +215,15 @@ namespace CbrToPdf
 
         public void progressUpdate(ProcessFile pwFS, int percentageCompleted)
         {
+           
+            
             backgroundWorker1.ReportProgress(percentageCompleted);
             Console.WriteLine(pwFS.getInputFile() + " has a percentage of: " + percentageCompleted);
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
+
             progressBar1.Value = e.ProgressPercentage;
 
             if (e.ProgressPercentage == 100)

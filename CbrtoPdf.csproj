@@ -105,6 +105,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="convertFile.cs" />
+    <Compile Include="DataGridViewProgressCell.cs" />
+    <Compile Include="DataGridViewProgressColumn.cs" />
     <Compile Include="GUInterface.cs">
       <SubType>Form</SubType>
     </Compile>
