@@ -1,1 +1,4 @@
 Thumbs.db
+*.exe
+obj/
+bin/
