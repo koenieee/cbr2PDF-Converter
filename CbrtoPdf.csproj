@@ -111,7 +111,7 @@
     <Compile Include="GUInterface.Designer.cs">
       <DependentUpon>GUInterface.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interface1.cs" />
+    <Compile Include="ProgressListener.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GUInterface.resx">

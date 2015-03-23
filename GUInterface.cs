@@ -22,6 +22,8 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using cbr2pdf;
 using System.Threading;
+using System.Collections;
+using System.Diagnostics;
 
 namespace CbrToPdf
 {
@@ -29,7 +31,7 @@ namespace CbrToPdf
     {
         public string input_bestand;
         private bool finished = false;
-        
+        private bool multipleFolder = false;
 
         public GUIInterface(string[] args)
         {
@@ -38,7 +40,7 @@ namespace CbrToPdf
 
             if (args.Length == 0)
             {
-                DialogResult mf = MessageBox.Show("Do you want to convert a whole folder? Press Yes\n\nIf you only want to convert a single file, Press No", "CBR To PDF Conveter", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk);
+                DialogResult mf = MessageBox.Show("Press Yes, if you want to convert a whole folder.\n\nPress No, If you only want to convert a single file.", "CBR To PDF Conveter", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk);
                 if (mf == DialogResult.Yes)
                 {
                     using (FolderBrowserDialog dlg = new FolderBrowserDialog())
@@ -46,6 +48,8 @@ namespace CbrToPdf
                         dlg.Description = "Select a folder";
                         if (dlg.ShowDialog() == DialogResult.OK)
                         {
+                            multipleFolder = true;
+                            input_bestand = dlg.SelectedPath;
                             MessageBox.Show("You selected: " + dlg.SelectedPath);
                         }
                     }
@@ -70,7 +74,7 @@ namespace CbrToPdf
                     }
                 }
 
-              
+
             }
             else
             {
@@ -84,28 +88,19 @@ namespace CbrToPdf
             else
             {
 
-
-                string dir = Path.GetDirectoryName(input_bestand);
-                string testFile = dir + "\\" + Path.GetFileNameWithoutExtension(input_bestand) + ".lock"; ;
-                try
+                if (multipleFolder)
                 {
-                    System.IO.StreamWriter file = new System.IO.StreamWriter(testFile);
-                    file.Close();
-
-                    File.Delete(testFile);
+                    string testFile = input_bestand + "\\123456789folder.lock";
+                    testWriteAccess(testFile);
+                    label1.Text = "Processing folder '" + input_bestand + "'...";
                 }
-                catch (System.UnauthorizedAccessException)
+                else
                 {
-                    MessageBox.Show("No write access to this directory: " + dir, "CBR To PDF Conveter", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    System.Environment.Exit(1);
+                    string dir = Path.GetDirectoryName(input_bestand);
+                    string testFile = dir + "\\" + Path.GetFileNameWithoutExtension(input_bestand) + ".lock";
+                    testWriteAccess(testFile);
+                    label1.Text = "Processing '" + Path.GetFileName(input_bestand) + "'...";
                 }
-
-                //backgroundWorker1.RunWorkerAsync();
-                // //backgroundWorker1.WorkerReportsProgress = true;
-                //backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker1_DoWork);
-                //
-
 
                 backgroundWorker1.WorkerReportsProgress = true;
                 backgroundWorker1.WorkerSupportsCancellation = true;
@@ -113,7 +108,24 @@ namespace CbrToPdf
                 backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
                 backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker1_RunWorkerCompleted);
                 backgroundWorker1.RunWorkerAsync();
-                label1.Text = "Processing '" + Path.GetFileName(input_bestand) + "'...";
+                
+            }
+        }
+
+        private void testWriteAccess(string testFile)
+        {
+            try
+            {
+                System.IO.StreamWriter file = new System.IO.StreamWriter(testFile);
+                file.Close();
+
+                File.Delete(testFile);
+            }
+            catch (System.UnauthorizedAccessException)
+            {
+                MessageBox.Show("No write access to the directory of: " + testFile, "CBR To PDF Conveter", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                System.Environment.Exit(1);
             }
         }
 
@@ -132,10 +144,11 @@ namespace CbrToPdf
             {
                 backgroundWorker1.CancelAsync();
             }
-            catch(System.InvalidOperationException){
+            catch (System.InvalidOperationException)
+            {
                 System.Environment.Exit(1);
             }
-            System.Environment.Exit(1);
+            System.Environment.Exit(0);
         }
 
 
@@ -143,33 +156,47 @@ namespace CbrToPdf
         {
             if (backgroundWorker1 != null)
             {
+                
                 while (!backgroundWorker1.CancellationPending && finished == false)
                 {
-                    ProcessFile pF = new ProcessFile(input_bestand);
-                    pF.setProgressListener(this);
-                    Thread th = new Thread(new ThreadStart(pF.startConvertingFile));
-                    th.Start();
-                  //  int prevValue = 0;
-                   // while (ProcessFile.percentage != prevValue)
-                  //  {
-                    //    Console.WriteLine("Prevalue: " + prevValue);
-                   //     prevValue = pF.percentageCompleted();
-                    //    if (pF.percentageCompleted() == 100)
-                   //     {
+                    if (multipleFolder)
+                    {
+                        string[] filePaths = Directory.GetFiles(input_bestand);
+                        ArrayList allthread = new ArrayList();//Thread th[];
+                        foreach(string fileName in filePaths){
+
+                            ProcessFile pF = new ProcessFile(fileName);
+                            pF.setProgressListener(this);
+                            Thread th = new Thread(new ThreadStart(pF.startConvertingFile));
+                            allthread.Add(th);
+                            th.Start();
+                        }
+                       // bool allDone = false;
+                        foreach (Thread x in allthread)
+                        {
                             try
                             {
-                                
-                                th.Join();
+                                Debug.WriteLine("waiting for thread to be stopped");
+                                x.Join();
                             }
                             catch (Exception _) { }
-                            finished = true;
-                            
-                    //    }
-                   //     else
-                   //     {
-                           // backgroundWorker1.ReportProgress(pF.percentageCompleted());
-                   //     }
-                   // }
+                        }
+                        finished = true;
+
+                    }
+                    else
+                    {
+                        ProcessFile pF = new ProcessFile(input_bestand);
+                        pF.setProgressListener(this);
+                        Thread th = new Thread(new ThreadStart(pF.startConvertingFile));
+                        th.Start();
+                        try
+                        {
+                            th.Join();
+                        }
+                        catch (Exception _) { }
+                        finished = true;
+                    }
                 }
             }
         }
@@ -177,7 +204,7 @@ namespace CbrToPdf
         public void progressUpdate(ProcessFile pwFS, int percentageCompleted)
         {
             backgroundWorker1.ReportProgress(percentageCompleted);
-            Console.WriteLine(pwFS.ToString() + " has a percentage of: " + percentageCompleted);
+            Console.WriteLine(pwFS.getInputFile() + " has a percentage of: " + percentageCompleted);
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -190,16 +217,23 @@ namespace CbrToPdf
             }
         }
 
-        public void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             progressBar1.Value = 100;
             string inputfile = input_bestand;
             string file = Path.GetFileName(inputfile);
             notifyIcon1.Visible = true;
-
-            notifyIcon1.ShowBalloonTip(5000, "Completion", "File '" + file + "' has been converted to PDF.", ToolTipIcon.Info);
+            if (multipleFolder)
+            {
+                notifyIcon1.ShowBalloonTip(5000, "Completion", "All the files in folder '" + file + "' are converted to PDF.", ToolTipIcon.Info);
+            }
+            else
+            {
+                notifyIcon1.ShowBalloonTip(5000, "Completion", "File '" + file + "' has been converted to PDF.", ToolTipIcon.Info);
+            }
             
-            System.Environment.Exit(1);
+
+            System.Environment.Exit(0);
         }
     }
 }

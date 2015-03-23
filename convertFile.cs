@@ -42,7 +42,12 @@ namespace cbr2pdf
             whoIsListener.progressUpdate(this, 10); 
         }
 
-        public void clearTempFolder()
+        public string getInputFile()
+        {
+            return Path.GetFileNameWithoutExtension(inputFile);
+        }
+
+        private void clearTempFolder()
         {
             System.IO.DirectoryInfo temp = new DirectoryInfo(tempFolder);
 
@@ -56,7 +61,7 @@ namespace cbr2pdf
             }
         }
 
-        public Boolean unzipCbz()
+        private Boolean unzipCbz()
         {
             whoIsListener.progressUpdate(this, 20);
             bool zipopen;
@@ -77,7 +82,7 @@ namespace cbr2pdf
             }
         }
 
-        public Boolean unrarCbr()
+        private Boolean unrarCbr()
         {
             whoIsListener.progressUpdate(this, 20);
             bool raropen, rarunrar;
@@ -88,7 +93,7 @@ namespace cbr2pdf
             return raropen && rarunrar;
         }
 
-        public string[] getFileNames()
+        private string[] getFileNames()
         {
             whoIsListener.progressUpdate(this, 40);
             string[] folders_all = System.IO.Directory.GetDirectories(tempFolder, "*", System.IO.SearchOption.AllDirectories);
@@ -108,7 +113,7 @@ namespace cbr2pdf
         }
 
 
-        public Boolean createPdf(string[] imageArray)
+        private Boolean createPdf(string[] imageArray)
         {
             whoIsListener.progressUpdate(this, 70);
             PdfDocument doc = new PdfDocument();
@@ -145,6 +150,7 @@ namespace cbr2pdf
                 Debug.WriteLine("Unrarring");
                 if (createPdf(getFileNames()))
                 {
+                    clearTempFolder();
                     whoIsListener.progressUpdate(this, 100);
                     Debug.WriteLine("Completed");
                 }
@@ -159,6 +165,7 @@ namespace cbr2pdf
                 Debug.WriteLine("Unzipping");
                 if (createPdf(getFileNames()))
                 {
+                    clearTempFolder();
                     whoIsListener.progressUpdate(this, 100);
                     Debug.WriteLine("Completed");
                 }
