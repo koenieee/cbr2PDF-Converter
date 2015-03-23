@@ -25,7 +25,7 @@ using System.Threading;
 
 namespace CbrToPdf
 {
-    public partial class GUIInterface : Form
+    public partial class GUIInterface : Form, ProgessListener
     {
         public string input_bestand;
         private bool finished = false;
@@ -146,6 +146,7 @@ namespace CbrToPdf
                 while (!backgroundWorker1.CancellationPending && finished == false)
                 {
                     ProcessFile pF = new ProcessFile(input_bestand);
+                    pF.setProgressListener(this);
                     Thread th = new Thread(new ThreadStart(pF.startConvertingFile));
                     th.Start();
                   //  int prevValue = 0;
@@ -162,7 +163,7 @@ namespace CbrToPdf
                             }
                             catch (Exception _) { }
                             finished = true;
-                            backgroundWorker1.ReportProgress(100);
+                            
                     //    }
                    //     else
                    //     {
@@ -171,6 +172,12 @@ namespace CbrToPdf
                    // }
                 }
             }
+        }
+
+        public void progressUpdate(ProcessFile pwFS, int percentageCompleted)
+        {
+            backgroundWorker1.ReportProgress(percentageCompleted);
+            Console.WriteLine(pwFS.ToString() + " has a percentage of: " + percentageCompleted);
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)

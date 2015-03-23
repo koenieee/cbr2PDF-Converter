@@ -2,6 +2,7 @@
 using PdfSharp.Pdf;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,13 +10,14 @@ using System.Threading;
 
 namespace cbr2pdf
 {
-    class ProcessFile
+    public class ProcessFile
     {
         string inputFile;
         string outputFile;
         string tempFolder;
         string unlockCodeChilkat = "ZIPT34MB34N_2E76BEB1p39E";
-        public static int percentage = 0;
+        ProgessListener whoIsListener;
+        
 
         public ProcessFile(string ipF) //process CBR or CBZ file. call Constructor and then startConvertingFiles()
         {
@@ -31,7 +33,13 @@ namespace cbr2pdf
             {
                 clearTempFolder();
             }
-            percentage = 10;
+            //Updatepercentage = 10;
+        }
+
+        public void setProgressListener(ProgessListener ls)
+        {
+            whoIsListener = ls;
+            whoIsListener.progressUpdate(this, 10); 
         }
 
         public void clearTempFolder()
@@ -50,7 +58,7 @@ namespace cbr2pdf
 
         public Boolean unzipCbz()
         {
-            percentage = 20;
+            whoIsListener.progressUpdate(this, 20);
             bool zipopen;
             int zipunzip;
             Chilkat.Zip zip = new Chilkat.Zip();
@@ -64,25 +72,25 @@ namespace cbr2pdf
             }
             else
             {
-                percentage = 30;
+                whoIsListener.progressUpdate(this, 30);
                 return true;
             }
         }
 
         public Boolean unrarCbr()
         {
-            percentage = 20;
+            whoIsListener.progressUpdate(this, 20);
             bool raropen, rarunrar;
             Chilkat.Rar rar = new Chilkat.Rar();
             raropen = rar.Open(inputFile);
             rarunrar = rar.Unrar(tempFolder);
-            percentage = 30;
+            whoIsListener.progressUpdate(this, 30);
             return raropen && rarunrar;
         }
 
         public string[] getFileNames()
         {
-            percentage = 40;
+            whoIsListener.progressUpdate(this, 40);
             string[] folders_all = System.IO.Directory.GetDirectories(tempFolder, "*", System.IO.SearchOption.AllDirectories);
 
             string[] images;
@@ -95,14 +103,14 @@ namespace cbr2pdf
                 string folder = folders_all[0];
                 images = Directory.GetFiles(folder, "*.jpg");
             }
-            percentage = 50;
+            whoIsListener.progressUpdate(this, 50);
             return images;
         }
 
 
         public Boolean createPdf(string[] imageArray)
         {
-            percentage = 60;
+            whoIsListener.progressUpdate(this, 70);
             PdfDocument doc = new PdfDocument();
 
             foreach (string oneImage in imageArray)
@@ -113,14 +121,15 @@ namespace cbr2pdf
                 XImage img = XImage.FromFile(oneImage);
 
                 xgr.DrawImage(img, 0, 0, 595, 841); //a normal A4 paper
+                img.Dispose();
                 
             }
-            percentage = 70;
+            whoIsListener.progressUpdate(this, 80);
             try
             {
                 doc.Save(outputFile);
                 doc.Close();
-                percentage = 80;
+                whoIsListener.progressUpdate(this, 90);
                 return true;
             }
             catch(Exception _){
@@ -133,43 +142,37 @@ namespace cbr2pdf
         {
             if (unrarCbr() == true)
             {
-                Console.WriteLine("Unrarring");
+                Debug.WriteLine("Unrarring");
                 if (createPdf(getFileNames()))
                 {
-                    percentage = 100;
-                    Console.WriteLine("Completed");
+                    whoIsListener.progressUpdate(this, 100);
+                    Debug.WriteLine("Completed");
                 }
                 else
                 {
-                    Console.WriteLine("Something went wrong");
+                    Debug.WriteLine("Something went wrong");
                     return;
                 }
             }
             else if (unzipCbz() == true)
             {
-                Console.WriteLine("Unzipping");
+                Debug.WriteLine("Unzipping");
                 if (createPdf(getFileNames()))
                 {
-                    percentage = 100;
-                    Console.WriteLine("Completed");
+                    whoIsListener.progressUpdate(this, 100);
+                    Debug.WriteLine("Completed");
                 }
                 else
                 {
-                    Console.WriteLine("Something went wrong.");
+                    Debug.WriteLine("Something went wrong.");
                     return;
                 }
             }
             else
             {
-                Console.WriteLine("Something went complety wrong");
+                Debug.WriteLine("Something went complety wrong");
                 return;
             }
         }
-
-        public int percentageCompleted()
-        {
-            return percentage;
-        }
-
     }
 }
