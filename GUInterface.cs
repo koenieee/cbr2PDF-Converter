@@ -52,6 +52,10 @@ namespace CbrToPdf
                             input_bestand = dlg.SelectedPath;
                             MessageBox.Show("You selected: " + dlg.SelectedPath);
                         }
+                        else
+                        {
+                            System.Environment.Exit(1);
+                        }
                     }
                 }
                 else
@@ -65,7 +69,6 @@ namespace CbrToPdf
 
                     if (result.Equals(DialogResult.Cancel) || result.Equals(DialogResult.Abort))
                     {
-                        MessageBox.Show("You didn't select a file, exiting CBR to PDF Converter.", "CBR To PDF Conveter", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                         System.Environment.Exit(1);
                     }
                     else if (result.Equals(DialogResult.OK))
@@ -161,9 +164,10 @@ namespace CbrToPdf
                 {
                     if (multipleFolder)
                     {
-                        string[] filePaths = Directory.GetFiles(input_bestand);
+                        List<String> filteredFiles = Directory.GetFiles(input_bestand, "*.*").Where(file => file.ToLower().EndsWith("cbr") || file.ToLower().EndsWith("cbz")).ToList();
                         ArrayList allthread = new ArrayList();//Thread th[];
-                        foreach(string fileName in filePaths){
+                        foreach (string fileName in filteredFiles)
+                        {
 
                             ProcessFile pF = new ProcessFile(fileName);
                             pF.setProgressListener(this);
@@ -182,7 +186,6 @@ namespace CbrToPdf
                             catch (Exception _) { }
                         }
                         finished = true;
-
                     }
                     else
                     {

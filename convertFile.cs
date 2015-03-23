@@ -12,18 +12,18 @@ namespace cbr2pdf
 {
     public class ProcessFile
     {
-        string inputFile;
-        string outputFile;
-        string tempFolder;
-        string unlockCodeChilkat = "ZIPT34MB34N_2E76BEB1p39E";
-        ProgessListener whoIsListener;
+        private string inputFile;
+        private string outputFile;
+        private string tempFolder;
+        private string unlockCodeChilkat = "WklQVDM0TUIzNE5fMkU3NkJFQjFwMzlF";
+        private ProgessListener whoIsListener;
         
 
         public ProcessFile(string ipF) //process CBR or CBZ file. call Constructor and then startConvertingFiles()
         {
             inputFile = ipF;
             outputFile = Path.GetDirectoryName(inputFile) + "\\" + Path.GetFileNameWithoutExtension(inputFile) + ".pdf";
-            tempFolder = System.IO.Path.GetTempPath() + "\\strips_"+Path.GetFileName(inputFile).Replace(" ","_");
+            tempFolder = System.IO.Path.GetTempPath() + "\\comics_"+Path.GetFileName(inputFile).Replace(" ","_");
 
             if (!Directory.Exists(tempFolder))
             {
@@ -67,7 +67,10 @@ namespace cbr2pdf
             bool zipopen;
             int zipunzip;
             Chilkat.Zip zip = new Chilkat.Zip();
-            zip.UnlockComponent(unlockCodeChilkat);
+            byte[] data = Convert.FromBase64String(unlockCodeChilkat);
+            string decodedString = Encoding.UTF8.GetString(data);
+
+            zip.UnlockComponent(decodedString);
 
             zipopen = zip.OpenZip(inputFile);
             zipunzip = zip.Unzip(tempFolder);
