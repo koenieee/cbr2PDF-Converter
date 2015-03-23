@@ -20,16 +20,18 @@ using System.Security;
 using System.Security.Permissions;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using cbr2pdf;
+using System.Threading;
 
 namespace CbrToPdf
 {
-    public partial class Form1 : Form
+    public partial class GUIInterface : Form
     {
         public string input_bestand;
         private bool finished = false;
         
 
-        public Form1(string[] args)
+        public GUIInterface(string[] args)
         {
             InitializeComponent();
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnApplicationExit);
@@ -143,111 +145,30 @@ namespace CbrToPdf
             {
                 while (!backgroundWorker1.CancellationPending && finished == false)
                 {
-                    int i = 0;
-                    backgroundWorker1.ReportProgress(i);
-
-                    //============Variables=========================//
-                    string inputfile = input_bestand;
-                    
-
-                    string inputfolder = System.IO.Path.GetTempPath() + "\\strips";
-                    string outputfile = Path.GetDirectoryName(inputfile) + "\\" + Path.GetFileNameWithoutExtension(inputfile) + ".pdf";
-
-                    i = 20;
-                    backgroundWorker1.ReportProgress(i);
-                    // Determine whether the directory exists.
-                    if (!Directory.Exists(inputfolder))
-                    {
-                        DirectoryInfo di = Directory.CreateDirectory(inputfolder);
-                    }
-
-
-                    System.IO.DirectoryInfo downloadedMessageInfo = new DirectoryInfo(System.IO.Path.GetTempPath() + "\\strips");
-
-                    foreach (FileInfo file in downloadedMessageInfo.GetFiles())
-                    {
-                        file.Delete();
-                    }
-                    foreach (DirectoryInfo dir in downloadedMessageInfo.GetDirectories())
-                    {
-                        dir.Delete(true);
-                    }
-
-                    i = 40;
-                    backgroundWorker1.ReportProgress(i);
-
-                    //CBR Unzipping=========================================//
-                    Chilkat.Rar rar = new Chilkat.Rar();
-                    Chilkat.Zip zip = new Chilkat.Zip();
-                    zip.UnlockComponent("ZIPT34MB34N_2E76BEB1p39E");
-                    bool rarsuccess;
-                    bool zipsucces;
-
-                    rarsuccess = rar.Open(inputfile);
-                    if (rarsuccess != true)
-                    {
-                        zipsucces = zip.OpenZip(inputfile);
-                        if (zipsucces != true)
-                        {
-                            MessageBox.Show(zip.LastErrorText);
-                            System.Environment.Exit(1);
-                        }
-                    }
-
-                    rarsuccess = rar.Unrar(inputfolder);
-                    if (rarsuccess != true)
-                    {
-                        int zipreturn = zip.Unzip(inputfolder);
-                        if (zipreturn == -1)
-                        {
-                            MessageBox.Show(zip.LastErrorText);
-                            System.Environment.Exit(1);
-                        }
-                        
-                    }
-                    else
-                    {
-
-                    }
-                    i = 60;
-                    backgroundWorker1.ReportProgress(i);
-
-
-                    string[] folders_all = System.IO.Directory.GetDirectories(inputfolder, "*", System.IO.SearchOption.AllDirectories);
-
-                    string[] plaatjes;
-                    if (folders_all.Length == 0)
-                    {
-                        plaatjes = Directory.GetFiles(inputfolder, "*.jpg");
-                    }
-                    else
-                    {
-                        string folder = folders_all[0];
-                        plaatjes = Directory.GetFiles(folder, "*.jpg");
-                    }
-
-                    PdfDocument doc = new PdfDocument();
-
-                    foreach (string source in plaatjes)
-                    {
-                        PdfPage page = doc.AddPage();
-
-                        XGraphics xgr = XGraphics.FromPdfPage(page);
-                        XImage img = XImage.FromFile(source);
-
-
-                        xgr.DrawImage(img, 0, 0, 595, 841);
-
-                    }
-                    i = 80;
-                    backgroundWorker1.ReportProgress(i);
-
-                    
-                    doc.Save(outputfile);
-                    doc.Close();
-                    i = 100;
-                    finished = true;
-                    backgroundWorker1.ReportProgress(i);
+                    ProcessFile pF = new ProcessFile(input_bestand);
+                    Thread th = new Thread(new ThreadStart(pF.startConvertingFile));
+                    th.Start();
+                  //  int prevValue = 0;
+                   // while (ProcessFile.percentage != prevValue)
+                  //  {
+                    //    Console.WriteLine("Prevalue: " + prevValue);
+                   //     prevValue = pF.percentageCompleted();
+                    //    if (pF.percentageCompleted() == 100)
+                   //     {
+                            try
+                            {
+                                
+                                th.Join();
+                            }
+                            catch (Exception _) { }
+                            finished = true;
+                            backgroundWorker1.ReportProgress(100);
+                    //    }
+                   //     else
+                   //     {
+                           // backgroundWorker1.ReportProgress(pF.percentageCompleted());
+                   //     }
+                   // }
                 }
             }
         }

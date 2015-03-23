@@ -18,10 +18,10 @@ namespace WindowsFormsApplication1
            
             if (args.Length != 0)
                 
-                Application.Run(new Form1(args));
+                Application.Run(new GUIInterface(args));
             else
 
-                Application.Run(new Form1(args));
+                Application.Run(new GUIInterface(args));
         }
     }
 }
