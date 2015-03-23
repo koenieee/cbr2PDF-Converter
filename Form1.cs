@@ -36,22 +36,39 @@ namespace CbrToPdf
 
             if (args.Length == 0)
             {
-                OpenFileDialog dialog = new OpenFileDialog();
-                dialog.Filter = "CBR files (*.cbr)|*.cbr|CBZ files (*.cbz)|*.cbz";
-
-                dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile); ; 
-                dialog.Title = "Select a CBR/CBZ  File";
-                DialogResult result = dialog.ShowDialog();
-
-                if (result.Equals(DialogResult.Cancel) || result.Equals(DialogResult.Abort))
+                DialogResult mf = MessageBox.Show("Do you want to convert a whole folder? Press Yes\n\nIf you only want to convert a single file, Press No", "CBR To PDF Conveter", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk);
+                if (mf == DialogResult.Yes)
                 {
-                    MessageBox.Show("You didn't select a file, exiting CBR to PDF Converter.", "CBR To PDF Conveter", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                    System.Environment.Exit(1);
+                    using (FolderBrowserDialog dlg = new FolderBrowserDialog())
+                    {
+                        dlg.Description = "Select a folder";
+                        if (dlg.ShowDialog() == DialogResult.OK)
+                        {
+                            MessageBox.Show("You selected: " + dlg.SelectedPath);
+                        }
+                    }
                 }
-                else if (result.Equals(DialogResult.OK))
+                else
                 {
-                    input_bestand = dialog.FileName;
+                    OpenFileDialog dialog = new OpenFileDialog();
+                    dialog.Filter = "CBR files (*.cbr)|*.cbr|CBZ files (*.cbz)|*.cbz";
+
+                    dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile); ;
+                    dialog.Title = "Select a CBR/CBZ  File";
+                    DialogResult result = dialog.ShowDialog();
+
+                    if (result.Equals(DialogResult.Cancel) || result.Equals(DialogResult.Abort))
+                    {
+                        MessageBox.Show("You didn't select a file, exiting CBR to PDF Converter.", "CBR To PDF Conveter", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        System.Environment.Exit(1);
+                    }
+                    else if (result.Equals(DialogResult.OK))
+                    {
+                        input_bestand = dialog.FileName;
+                    }
                 }
+
+              
             }
             else
             {
